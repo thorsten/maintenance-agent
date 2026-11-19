@@ -1,0 +1,52 @@
+# Create two pipeline schedules, each with the variable TASK:
+#   TASK=renovate  (e.g. 01:17)
+#   TASK=agent     (e.g. 04:17, once the pipelines of the update MRs have finished)
+# CI/CD variables (masked): MAINT_GITLAB_TOKEN, ANTHROPIC_API_KEY,
+# optionally GITHUB_COM_TOKEN (changelogs from github.com) and MAINT_GROUP.
+
+stages: [build, run]
+
+build-image:
+  stage: build
+  image: docker:27
+  services: ['docker:27-dind']
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - docker build -t "$CI_REGISTRY_IMAGE:latest" .
+    - docker push "$CI_REGISTRY_IMAGE:latest"
+
+renovate:
+  stage: run
+  # Pin the tag to a fixed version once this is running.
+  image:
+    name: ghcr.io/renovatebot/renovate:latest
+    entrypoint: ['']
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $TASK == "renovate"
+  variables:
+    RENOVATE_PLATFORM: gitlab
+    RENOVATE_ENDPOINT: $CI_API_V4_URL
+    RENOVATE_TOKEN: $MAINT_GITLAB_TOKEN
+    RENOVATE_CONFIG_FILE: renovate/config.js
+    LOG_LEVEL: info
+  script:
+    - renovate
+
+agent:
+  stage: run
+  image:
+    name: $CI_REGISTRY_IMAGE:latest
+    entrypoint: ['']
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule" && $TASK == "agent"
+  timeout: 2h
+  variables:
+    PLATFORM: gitlab
+    GITLAB_URL: $CI_SERVER_URL
+    GITLAB_TOKEN: $MAINT_GITLAB_TOKEN
+    GITLAB_GROUP: $MAINT_GROUP
+  script:
+    # Start from the checkout so the current state of the repo always applies.
+    - bin/run.sh

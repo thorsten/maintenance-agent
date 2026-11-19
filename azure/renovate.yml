@@ -1,0 +1,29 @@
+# Pipeline variables (secret): MAINT_AZURE_PAT, optional GITHUB_COM_TOKEN.
+trigger: none
+
+schedules:
+  - cron: '17 1 * * *'
+    displayName: Renovate nightly
+    branches:
+      include: [main]
+    always: true
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  # Pin the tag to a fixed version once this is running.
+  - script: |
+      docker run --rm \
+        -e RENOVATE_TOKEN -e RENOVATE_PLATFORM -e RENOVATE_ENDPOINT \
+        -e RENOVATE_CONFIG_FILE -e GITHUB_COM_TOKEN -e LOG_LEVEL \
+        -v "$(Build.SourcesDirectory)/renovate:/cfg:ro" \
+        ghcr.io/renovatebot/renovate:latest
+    displayName: Renovate
+    env:
+      RENOVATE_TOKEN: $(MAINT_AZURE_PAT)
+      RENOVATE_PLATFORM: azure
+      RENOVATE_ENDPOINT: $(System.CollectionUri)
+      RENOVATE_CONFIG_FILE: /cfg/config.js
+      GITHUB_COM_TOKEN: $(GITHUB_COM_TOKEN)
+      LOG_LEVEL: info

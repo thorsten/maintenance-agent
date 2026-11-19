@@ -1,0 +1,51 @@
+name: Maintenance agent
+
+on:
+  schedule:
+    # A few hours after Renovate, so the CI of the update PRs has finished.
+    - cron: '17 4 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Only show what would happen, do not push or comment'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: maintenance-agent
+  cancel-in-progress: false
+
+jobs:
+  agent:
+    runs-on: ubuntu-latest
+    # The app token is valid for one hour; the run has to finish before that.
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t maintenance-agent .
+
+      - uses: actions/create-github-app-token@v2
+        id: token
+        with:
+          app-id: ${{ vars.MAINT_APP_ID }}
+          private-key: ${{ secrets.MAINT_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      - name: Agent
+        env:
+          PLATFORM: github
+          GITHUB_TOKEN: ${{ steps.token.outputs.token }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          MAX_PRS: ${{ vars.MAINT_MAX_PRS || '5' }}
+          DRY_RUN: ${{ inputs.dry_run && '1' || '0' }}
+        run: |
+          docker run --rm \
+            -e PLATFORM -e GITHUB_TOKEN -e GITHUB_OWNER \
+            -e ANTHROPIC_API_KEY -e MAX_PRS -e DRY_RUN \
+            maintenance-agent

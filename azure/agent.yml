@@ -1,0 +1,30 @@
+# Pipeline variables (secret): MAINT_AZURE_PAT, ANTHROPIC_API_KEY.
+trigger: none
+
+schedules:
+  - cron: '17 4 * * *'
+    displayName: Maintenance agent nightly
+    branches:
+      include: [main]
+    always: true
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - script: docker build -t maintenance-agent .
+    displayName: Build image
+
+  - script: |
+      docker run --rm \
+        -e PLATFORM -e AZURE_DEVOPS_URL -e AZURE_DEVOPS_PAT \
+        -e ANTHROPIC_API_KEY -e MAX_PRS \
+        maintenance-agent
+    displayName: Agent
+    timeoutInMinutes: 120
+    env:
+      PLATFORM: azure
+      AZURE_DEVOPS_URL: $(System.CollectionUri)
+      AZURE_DEVOPS_PAT: $(MAINT_AZURE_PAT)
+      ANTHROPIC_API_KEY: $(ANTHROPIC_API_KEY)
+      MAX_PRS: '5'
