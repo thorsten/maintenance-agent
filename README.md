@@ -93,3 +93,7 @@ bash tests/smoke.sh
 # Real dry run against GitHub
 PLATFORM=github GITHUB_TOKEN=… GITHUB_OWNER=… ANTHROPIC_API_KEY=… DRY_RUN=1 MAX_PRS=1 bin/run.sh
 ```
+
+## License
+
+[MIT](LICENSE)

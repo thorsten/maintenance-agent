@@ -24,12 +24,12 @@ jobs:
     # The app token is valid for one hour; the run has to finish before that.
     timeout-minutes: 55
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Build image
         run: docker build -t maintenance-agent .
 
-      - uses: actions/create-github-app-token@v2
+      - uses: actions/create-github-app-token@v3
         id: token
         with:
           app-id: ${{ vars.MAINT_APP_ID }}

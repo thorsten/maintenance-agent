@@ -1,6 +1,6 @@
 # Core image: orchestrator, Claude Code CLI and the common toolchains.
 # Add further runtimes (Python, Go, Java, .NET, another PHP version) here.
-FROM node:22-bookworm-slim
+FROM node:26-bookworm-slim
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
