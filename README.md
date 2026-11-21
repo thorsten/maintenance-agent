@@ -29,7 +29,7 @@ There is at most one agent run per PR: if the last commit is already from the ag
 
 **GitHub**
 - Create a GitHub App (repository permissions: Contents, Pull requests, Issues, Workflows each Read & Write; Checks and Commit statuses Read) and install it on the desired repos.
-- In this repo: variable `MAINT_APP_ID`, secrets `MAINT_APP_PRIVATE_KEY` and `ANTHROPIC_API_KEY`.
+- In this repo: variable `MAINT_APP_CLIENT_ID` (the Client ID of the app, not the App ID), secrets `MAINT_APP_PRIVATE_KEY` and `ANTHROPIC_API_KEY`.
 
 **GitLab**
 - Group access token (role Developer, scopes `api`, `write_repository`) as the masked variable `MAINT_GITLAB_TOKEN`, plus `ANTHROPIC_API_KEY` and optionally `MAINT_GROUP`.

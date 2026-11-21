@@ -32,7 +32,7 @@ jobs:
       - uses: actions/create-github-app-token@v3
         id: token
         with:
-          app-id: ${{ vars.MAINT_APP_ID }}
+          client-id: ${{ vars.MAINT_APP_CLIENT_ID }}
           private-key: ${{ secrets.MAINT_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
 
