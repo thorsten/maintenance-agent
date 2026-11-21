@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Checks the commit message against .commitlintrc.yml.
+# Activate once per clone: git config core.hooksPath .githooks
+set -euo pipefail
+
+command -v npx >/dev/null 2>&1 || {
+  echo "commit-msg: npx not found, cannot run commitlint" >&2
+  exit 1
+}
+
+exec npx --yes \
+  --package @commitlint/cli \
+  --package @commitlint/config-conventional \
+  -- commitlint --edit "$1"

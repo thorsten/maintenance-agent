@@ -48,6 +48,18 @@ A change to the contract affects all three adapters and `tests/mock-adapter.sh`.
 - New configuration: environment variable with a default at the top of `bin/run.sh` (or in the adapter's header comment) **and** a row in the README table.
 - No new runtime dependencies beyond `git`, `curl`, `jq`, `claude` without updating `require_cmd` and the `Dockerfile` as well.
 
+## Commits
+
+Commit messages follow [commitlint](https://commitlint.js.org) with `@commitlint/config-conventional` (`.commitlintrc.yml`): `type(scope): subject`, e.g. `fix(github): handle empty label list`. Scope is optional, the subject starts lowercase and has no trailing full stop, header and body lines stay within 100 characters.
+
+The hook `.githooks/commit-msg` checks every commit. It needs `npx` and is activated once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Check that `git config core.hooksPath` returns `.githooks` before you commit, and never bypass the hook with `--no-verify`.
+
 ## Security invariants
 
 These properties are intentional. Do not weaken them, not even "temporarily":

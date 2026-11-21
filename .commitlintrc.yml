@@ -1,0 +1,3 @@
+# Commit message rules, see https://commitlint.js.org
+extends:
+  - '@commitlint/config-conventional'
