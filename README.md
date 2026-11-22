@@ -82,7 +82,7 @@ The agent handles Dependabot PRs the same way as Renovate PRs: it picks up every
 - Renovate no longer updates a branch automatically once a foreign commit sits on it. This is intended here, so that the agent's work is preserved. If a newer version arrives later, have Renovate recreate the PR via its rebase checkbox.
 - GitHub computes `mergeable` with a delay. A fresh conflict is sometimes only detected in the next run.
 - At most 100 open PRs (GitHub, GitLab) or 200 (Azure) are considered per run.
-- The image ships Node and PHP 8.2. Add other runtimes in the `Dockerfile`.
+- The image ships Node and PHP 8.5 (build argument `PHP_VERSION`). Add other runtimes in the `Dockerfile`.
 - Image tags of Renovate and action versions are not pinned. Fix them before continuous operation.
 
 ## Testing locally
